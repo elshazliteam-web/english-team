@@ -1,0 +1,77 @@
+name: Deploy English Team site
+
+on:
+  push:
+    branches:
+      - v5
+  schedule:
+    - cron: "45 19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Get the notes from english-team-notes
+        uses: actions/checkout@v6
+        with:
+          repository: elshazliteam-web/english-team-notes
+          path: _notes
+      - name: Put the notes into the site
+        run: |
+          rm -rf content
+          mkdir content
+          if [ -d _notes/Notion ]; then cp -r _notes/Notion/. content/; fi
+          rm -rf _notes
+          rm -rf "content/System Backend" "content/Private & Shared" "content/Team Tasks Todo List and tracker" "content/_New from Notion"
+          cat > content/index.md <<'MD'
+          ---
+          title: English Team Notes
+          ---
+          Welcome to the English Team notes.
+
+          - [[2027 Course Plan]]
+          - [[🖋️ English Team Lesson Plans]]
+          - [[✏️ English Team Class Notes]]
+          - [[English Team Student Success Planner]]
+          - [[Welcome New Students]]
+          - [[Dr. Tahir Elshazli]]
+          - [[GoStars Content Playbook]]
+          MD
+          sed -i 's/^          //' content/index.md
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Install Dependencies
+        run: npm ci
+      - name: Install Quartz plugins
+        run: npx quartz plugin install
+      - name: Build Quartz
+        run: npx quartz build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
