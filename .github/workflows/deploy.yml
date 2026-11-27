@@ -21,11 +21,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Get the notes from english-team-notes
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: elshazliteam-web/english-team-notes
           path: _notes
@@ -51,7 +51,7 @@ jobs:
           - [[GoStars Content Playbook]]
           MD
           sed -i 's/^          //' content/index.md
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Install Dependencies
@@ -61,7 +61,7 @@ jobs:
       - name: Build Quartz
         run: npx quartz build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
@@ -74,4 +74,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
