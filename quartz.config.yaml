@@ -1,0 +1,5 @@
+extends: default
+configuration:
+  pageTitle: English Team Notes
+  baseUrl: elshazliteam-web.github.io/english-team
+  locale: en-US
